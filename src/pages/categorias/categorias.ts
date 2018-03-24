@@ -35,10 +35,7 @@ export class CategoriasPage {
       this.categorias = response;
 
     },
-  error=>{
-   console.log(error);
-
-  });
+  error=>{});
 
   }
 
