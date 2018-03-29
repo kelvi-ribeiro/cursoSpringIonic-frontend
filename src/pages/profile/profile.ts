@@ -1,3 +1,4 @@
+import { Observable } from 'rxjs/Rx';
 import { ClienteService } from './../../services/domain/cliente.service';
 import { ClienteDTO } from './../../models/cliente.dto';
 import { StorageService } from './../../services/storage.service';
@@ -48,5 +49,6 @@ export class ProfilePage {
 
     })
   }
+  }
 
-}
+

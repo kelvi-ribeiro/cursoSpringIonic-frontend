@@ -25,9 +25,23 @@ export class ProdutosPage {
     this.produtoService.findByCategoria(categoria_id)
     .subscribe(response=>{
       this.produtos = response['content'];
+      this.loadImageUrls();
     },error=>{
 
     });
 
   }
+
+  loadImageUrls(){
+    this.produtos.forEach(produto=>{
+    this.produtoService.getSmallImageFromBucket(produto.id)
+    .subscribe(response=>{
+      produto.imageUrl = `${API_CONFIG.bucketBaseUrl}/prod${produto.id}-small.jpg`
+
+    });
+    },error=>{
+
+    });
+  }
+
 }
