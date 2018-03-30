@@ -1,3 +1,4 @@
+import { PedidoService } from './../../services/domain/pedido.service';
 import { EnderecoDTO } from './../../models/endereco.dto';
 import { CartService } from './../../services/domain/cart.service';
 import { CartItem } from './../../models/cart-item';
@@ -25,7 +26,8 @@ export class OrderConfirmationPage {
               public navCtrl: NavController,
               public navParams: NavParams,
               public cartService:CartService,
-              public clienteService:ClienteService) {
+              public clienteService:ClienteService,
+              public pedidoService:PedidoService) {
     this.pedido = this.navParams.get('pedido');
   }
 
@@ -46,6 +48,22 @@ export class OrderConfirmationPage {
 
   showTotalPrice(){
     return this.cartService.total();
+  }
+
+  back(){
+    this.navCtrl.setRoot('CartPage');
+  }
+
+  checkout(){
+    this.pedidoService.insert(this.pedido)
+    .subscribe(response=>{
+      this.cartService.createOrClearCart();
+      console.log(response.headers.get('location'));
+    },error=>{
+      if(error.status==403){
+        this.navCtrl.setRoot('HomePage');
+      }
+    })
   }
 
 
