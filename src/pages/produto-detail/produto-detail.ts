@@ -24,7 +24,7 @@ export class ProdutoDetailPage {
 
   ionViewDidLoad() {
     let produto_id = this.navParams.get('produto_id');
-    this.produtoService.fidById(produto_id)
+    this.produtoService.findById(produto_id)
     .subscribe(response=>{
       this.produto = response;
       this.getImageUrlIfExists()
@@ -34,7 +34,7 @@ export class ProdutoDetailPage {
   }
 
   getImageUrlIfExists(){
-    this.produtoService.getimageFromBucket(this.produto.id)
+    this.produtoService.getImageFromBucket(this.produto.id)
     .subscribe(response=>{
       this.produto.imageUrl = `${API_CONFIG.bucketBaseUrl}/prod${this.produto.id}.jpg`
     },error=>{

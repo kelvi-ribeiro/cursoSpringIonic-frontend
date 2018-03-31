@@ -16,7 +16,7 @@
     <button navPush="CartPage" ion-fab mini><ion-icon name="cart"></ion-icon></button>
     </ion-fab>
     <ion-list>
-      <button ion-item *ngFor="let produto of produtos" (click)="showDetails(produto.id);">
+      <button ion-item *ngFor="let produto of produtos" (click)="showDetail(produto.id);">
         <ion-thumbnail item-start>
           <img [src]="produto.imageUrl || 'assets/imgs/prod.jpg'">
         </ion-thumbnail>
@@ -27,4 +27,5 @@
     <ion-infinite-scroll (ionInfinite)="doInfinite($event)">
       <ion-infinite-scroll-content></ion-infinite-scroll-content>
     </ion-infinite-scroll>
+
   </ion-content>
