@@ -1,8 +1,9 @@
-import { ProdutoService } from './../../services/produto.service';
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { ProdutoDTO } from '../../models/produto.dto';
 import { API_CONFIG } from '../../config/api.config';
+import { LoadingController } from 'ionic-angular/components/loading/loading-controller';
+import { ProdutoService } from '../../services/produto.service';
 
 @IonicPage()
 @Component({
@@ -11,63 +12,77 @@ import { API_CONFIG } from '../../config/api.config';
 })
 export class ProdutosPage {
 
-  produtos : ProdutoDTO[];
+  produtos : ProdutoDTO[] = [];
+  page : number = 0;
 
   constructor(
-              public navCtrl: NavController,
-              public navParams: NavParams,
-              public produtoService:ProdutoService,
-              public loadingCtrl:LoadingController) {
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    public produtoService: ProdutoService,
+    public loadingCtrl: LoadingController) {
   }
 
   ionViewDidLoad() {
     this.loadData();
   }
-  loadData(){
+
+  loadData() {
     let categoria_id = this.navParams.get('categoria_id');
     let loader = this.presentLoading();
-    this.produtoService.findByCategoria(categoria_id)
-    .subscribe(response=>{
-      this.produtos = response['content'];
-      loader.dismiss();
-      this.loadImageUrls();
-    },error=>{
-      loader.dismiss();
-
-    });
-
+    this.produtoService.findByCategoria(categoria_id, this.page, 10)
+      .subscribe(response => {
+        let start = this.produtos.length;
+        this.produtos = this.produtos.concat(response['content']);
+        let end = this.produtos.length - 1;
+        loader.dismiss();
+        console.log(this.page);
+        console.log(this.produtos);
+        this.loadImageUrls(start, end);
+      },
+      error => {
+        loader.dismiss();
+      });
   }
 
-
-  loadImageUrls(){
-    this.produtos.forEach(produto=>{
-    this.produtoService.getSmallImageFromBucket(produto.id)
-    .subscribe(response=>{
-      produto.imageUrl = `${API_CONFIG.bucketBaseUrl}/prod${produto.id}-small.jpg`
-
-    });
-    },error=>{
-
-    });
+  loadImageUrls(start: number, end: number) {
+    for (var i=start; i<=end; i++) {
+      let item = this.produtos[i];
+      this.produtoService.getSmallImageFromBucket(item.id)
+        .subscribe(response => {
+          item.imageUrl = `${API_CONFIG.bucketBaseUrl}/prod${item.id}-small.jpg`;
+        },
+        error => {});
+    }
   }
 
-  showDetails(produto_id){
-    this.navCtrl.push('ProdutoDetailPage',{produto_id:produto_id});
+  showDetail(produto_id : string) {
+    this.navCtrl.push('ProdutoDetailPage', {produto_id: produto_id});
   }
 
-  presentLoading(){
+  presentLoading() {
     let loader = this.loadingCtrl.create({
-      content:"Aguarde..."
+      content: "Aguarde..."
     });
     loader.present();
     return loader;
   }
 
-  doRefresh(refresher){
-    setTimeout(()=>{
-      this.loadData();
+  doRefresh(refresher) {
+    this.page = 0;
+    this.produtos = [];
+    this.produtos = [];
+    this.page = 0;
+    this.loadData();
+    setTimeout(() => {
       refresher.complete();
-    },1500);
+    }, 1000);
   }
 
+  doInfinite(infiniteScroll) {
+    this.page++;
+    this.loadData();
+    setTimeout(() => {
+      infiniteScroll.complete();
+    }, 1000);
+  }
 }
